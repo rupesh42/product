@@ -1,0 +1,30 @@
+<div class="page-container">
+  <label for="productId">Search</label> <br />
+  <input
+    type="number"
+    [(ngModel)]="productId"
+    (ngModelChange)="onInputChange()"
+    (keyup.enter)="getProductbyId()"
+    placeholder="Enter product id"
+    class="input"
+  />
+  <br />
+
+  <button [disabled]="!productId || productId <= 0" (click)="getProductbyId()" class="action-btn">
+    Find
+  </button>
+  <br />
+</div>
+
+@defer (when productId) {
+  @if (product$ | async; as result) {
+    <h3 class="product-title">{{ result.title }}</h3>
+    <h4 class="product-price">{{ result.price | currency: 'EUR' }}</h4>
+  } @else if (productId.trim() && !(loading$ | async) && (error$ | async)) {
+    <p>Error</p>
+  }
+} @loading {
+  <div class="spinner">
+    <p>loading..</p>
+  </div>
+}
