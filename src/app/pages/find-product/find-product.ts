@@ -23,9 +23,8 @@ export class FindProduct {
   private productService = inject(ProductService);
   searchInput$ = new BehaviorSubject<string>('');
   productId: any = '';
-  loading$ = this.productService.loading$;
-
-  error$ = this.productService.error$;
+  loading = this.productService.loading;
+  error = this.productService.error;
 
   product$ = this.searchInput$.pipe(
     debounceTime(400),

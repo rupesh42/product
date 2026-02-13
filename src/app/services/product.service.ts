@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, catchError, count, finalize, map, Observable, of, retry } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
+import { BehaviorSubject, catchError, finalize, map, Observable, of, retry } from 'rxjs';
 import { Product, ProductsResponse } from '../models/product.model';
 
 @Injectable({
@@ -11,38 +11,77 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  private errorSubject = new BehaviorSubject<string | null>(null);
-  private loadingSubject = new BehaviorSubject<boolean>(false);
+  error = signal<string | null>(null);
 
-  error$ = this.errorSubject.asObservable();
-
-  loading$ = this.loadingSubject.asObservable();
+  loading = signal<boolean>(false);
 
   getProducts(): Observable<Product[]> {
-    this.loadingSubject.next(true);
-    this.errorSubject.next(null);
+    this.error.set(null);
+    this.loading.set(false);
     return this.http.get<ProductsResponse>(this.apiURI).pipe(
       map((response) => response.products),
       catchError((eer) => {
-        this.errorSubject.next('Issue in loading data');
+        this.error.set('Issue in loading data');
         return of([]);
       }),
-      finalize(() => this.loadingSubject.next(false)),
+      finalize(() => this.loading.set(false)),
     );
   }
 
   findProduct(id: number): Observable<Product | null> {
-    this.loadingSubject.next(true);
+    this.loading.set(true);
 
-    this.errorSubject.next(null);
+    this.error.set(null);
 
     return this.http.get<Product>(`${this.apiURI}/${id}`).pipe(
-      retry({ count: 2 }),
+      retry({ count: 2, delay: 1000 }),
       catchError((eer) => {
-        this.errorSubject.next('Issue in loading data');
+        this.error.set('Issue in loading data');
         return of(null);
       }),
-      finalize(() => this.loadingSubject.next(false)),
+      finalize(() => this.loading.set(false)),
+    );
+  }
+
+  searchByName(name: string): Observable<Product[]> {
+    this.loading.set(true);
+    this.error.set(null);
+    return this.http.get<{ products: Product[] }>(`${this.apiURI}/search?q=${name}`).pipe(
+      retry({ count: 2, delay: 1000 }),
+      map((response) => response.products),
+      catchError((err) => {
+        this.error.set('Issue in loading data');
+        return of([]);
+      }),
+      finalize(() => this.loading.set(false)),
+    );
+  }
+
+  updateProduct(id: number, productData: Partial<Product>): Observable<Product | null> {
+    this.loading.set(true); // Wahi purana logic
+    this.error.set(null);
+
+    return this.http.put<Product>(`${this.apiURI}/${id}`, productData).pipe(
+      retry({ count: 1, delay: 1000 }),
+      catchError((err) => {
+        this.error.set('Issue in updating data'); // Uniform error message
+        return of(null);
+      }),
+      finalize(() => this.loading.set(false)),
+    );
+  }
+
+  deleteProduct(id: number): Observable<boolean> {
+    this.loading.set(true);
+    this.error.set(null);
+
+    return this.http.delete(`${this.apiURI}/${id}`).pipe(
+      map(() => true), // Agar delete ho gaya toh return TRUE
+      catchError((err) => {
+        this.error.set('Delete failed');
+        return of(false); // Agar fail hua toh return FALSE
+      }),
+      finalize(() => this.loading.set(false)),
     );
   }
 }

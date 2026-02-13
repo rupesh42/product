@@ -1,25 +1,25 @@
 <div class="page-container products-container">
   <h2 class="products-title">Products</h2>
 
-  @if (error$ | async; as error) {
-    <p class="error-message">{{ error }}</p>
+  @if (error()) {
+  <p class="error-message">{{ error() }}</p>
   }
-  @if (loading$ | async) {
-    <div class="spinner-border">Loading</div>
+  @if (isLoading()) {
+  <div class="spinner-border">Loading</div>
   }
 
   @if (product$ | async; as products) {
-    <div class="products-grid">
-      @for (product of products; track product.id) {
-        <div class="product-card">
-          <img [src]="product.thumbnail" [alt]="product.title" class="image product-image" />
-          <h3 class="product-name">{{ product.title }}</h3>
-          <p class="product-description">{{ product.description }}</p>
-          <p class="product-price">{{ product.price | currency: 'EUR' }}</p>
-          <button class="action-btn product-button">Add to Cart</button>
-        </div>
-      }
+  <div class="products-grid">
+    @for (product of products; track product.id) {
+    <div class="product-card">
+      <img [src]="product.thumbnail" [alt]="product.title" class="image product-image" />
+      <h3 class="product-name">{{ product.title }}</h3>
+      <p class="product-description">{{ product.description }}</p>
+      <p class="product-price">{{ product.price | currency: 'EUR' }}</p>
+      <button class="action-btn product-button">Add to Cart</button>
     </div>
+    }
+  </div>
   }
 
   <ng-template #loading>

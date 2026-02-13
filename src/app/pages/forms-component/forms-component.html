@@ -1,0 +1,16 @@
+<form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+  <input formControlName="productName" placeholder="Product Name">
+
+  <div formArrayName="specs">
+    @for (spec of specs.controls; track spec; let i = $index) {
+    <div [formGroupName]="i">
+      <input formControlName="name" placeholder="Color/Size">
+      <input formControlName="value" placeholder="Red/Large">
+      <button type="button" (click)="removeSpec(i)">Delete</button>
+    </div>
+    }
+  </div>
+
+  <button type="button" (click)="addSpec()">+ Add Specification</button>
+  <button type="submit">Submit</button>
+</form>

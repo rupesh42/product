@@ -85,13 +85,14 @@ body {
   gap: 24px;
   width: 100%;
 }
+
 .price-tag {
   font-size: 24px;
   font-weight: 700;
   color: var(--color-accent);
 }
 
-.action-btn {
+.btn {
   background: var(--color-primary);
   color: var(--color-white);
   border: none;
@@ -99,6 +100,30 @@ body {
   border-radius: var(--radius);
   font-size: 14px;
   font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+
+  &:hover {
+    background: var(--color-secondary);
+  }
+
+  &:disabled {
+    background-color: #cccccc; // Gray out
+    color: #666666;
+    cursor: not-allowed; // Show the "Circle with a Slash"
+    opacity: 0.6; // Make it look faded
+    pointer-events: none; // Extra safety to block clicks
+  }
+}
+
+.edit-btn {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: #ff8c00;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  font-size: 10px;
+  font-weight: 400;
   cursor: pointer;
   transition: var(--transition);
 

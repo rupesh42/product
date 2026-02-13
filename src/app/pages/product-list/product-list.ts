@@ -15,16 +15,14 @@ export class ProductList implements OnInit {
   private productService = inject(ProductService);
 
   product$ = this.productService.getProducts().pipe(shareReplay(1));
-  loading$!: Observable<boolean>;
-  error$!: Observable<String | null>;
+  error = this.productService.error;
+  isLoading = this.productService.loading;
 
   ngOnInit(): void {
     this.getProducts();
   }
 
   getProducts() {
-    this.error$ = this.productService.error$;
-    this.loading$ = this.productService.loading$;
     this.product$ = this.productService.getProducts();
   }
 }
